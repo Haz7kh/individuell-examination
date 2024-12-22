@@ -7,9 +7,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3 # Check out the repository code
-      - uses: actions/setup-node@v3 # Set up Node.js
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: 18
-      - run: npm install # Install dependencies
-      - run: npm test -- --coverage # Run tests and check coverage
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Run tests with coverage
+        run: npm test -- --coverage
+        
+      - name: Upload Coverage Report
+        if: success() # Only upload if tests pass
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage/lcov-report
+          
+      - name: Fail if coverage is low
+        run: npm test -- --coverage --watchAll=false
